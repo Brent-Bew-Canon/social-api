@@ -95,7 +95,23 @@ module.exports = {
     },
 
     // add a new friend to a user's friend list
+    async updateFriends(req, res) {
+        try {
+            let user = await User.findOne({ _id: req.params.userId })
+                .select('-__v');
 
+            if (!user) {
+                return res.status(404).json({ message: 'No User with that ID' })
+            }
+            user.friends.push(req.params.friendId)
+            user.save();
+            res.json({
+                user
+            });
+        } catch (error) {
+
+        }
+    },
 
     // remove a friend from a user's friend list
 };
