@@ -114,6 +114,26 @@ module.exports = {
     },
 
     // remove a friend from a user's friend list
+    async deleteFriends(req, res) {
+        try {
+            let user = await User.findOneAndUpdate(
+                { _id: req.params.userId },
+                { $pull: { friends: req.params.friendId } },
+                { new: true }
+            );
+
+            if (!user) {
+                return res.status(404).json({ message: 'No User with that ID' })
+            }
+            res.json({
+                user
+            });
+        } catch (error) {
+
+        }
+    },
+
+
 };
 
 // Aggregate function for getting the overall grade using $avg
