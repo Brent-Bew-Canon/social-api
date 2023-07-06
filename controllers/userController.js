@@ -11,12 +11,12 @@ const userCount = async () => {
 
 
 module.exports = {
-    // Get all students
+    // Get all users
     async getAllUsers(req, res) {
         try {
-            const users = await User.find();
+            let users = await User.find();
 
-            const userObj = {
+            let userObj = {
                 users,
                 userCount: await userCount(),
             };
@@ -29,11 +29,12 @@ module.exports = {
     },
 
 
-    // Get a single student
+    // Get a single user
     async getSingleUser(req, res) {
         try {
-            const user = await User.findOne({ _id: req.params.userId })
-                .select('-__v friends thoughts');
+            let user = await User.findOne({ _id: req.params.userId })
+                // .select('-__v friends thoughts');
+                .select('-__v');
 
             if (!user) {
                 return res.status(404).json({ message: 'No User with that ID' })
@@ -50,13 +51,53 @@ module.exports = {
     // create a new user
     async createUser(req, res) {
         try {
-            const user = await User.create(req.body);
+            let user = await User.create(req.body);
             res.json(user);
         } catch (err) {
             res.status(500).json(err);
         }
-    }
+    },
 
+    // update a user
+    async updateUser(req, res) {
+        try {
+            let user = await User.findOne({ _id: req.params.userId })
+                .select('-__v');
+
+            if (!user) {
+                return res.status(404).json({ message: 'No User with that ID' })
+            }
+            user.username = req.body.username;
+            user.email = req.body.email;
+            user.save();
+            res.json({
+                user
+            });
+        } catch (error) {
+
+        }
+    },
+
+    //delete a user
+    async deleteUser(req, res) {
+        try {
+            let user = await User.findOneAndRemove({ _id: req.params.userId });
+
+            if (!user) {
+                return res.status(404).json({ message: 'User does not exist' });
+            }
+
+            res.json({ message: 'User successfully deleted' });
+        } catch (err) {
+            console.log(err);
+            res.status(500).json(err);
+        }
+    },
+
+    // add a new friend to a user's friend list
+
+
+    // remove a friend from a user's friend list
 };
 
 // Aggregate function for getting the overall grade using $avg
